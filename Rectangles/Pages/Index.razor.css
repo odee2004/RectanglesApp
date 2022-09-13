@@ -1,0 +1,16 @@
+﻿table th {
+    text-align: center;
+    width: 20px;
+    height: 25px;
+}
+
+table tr td {
+    border: 1px solid;
+    text-align: center;
+    width: 20px;
+    height: 25px;
+}
+
+label input {
+    width: 50px;
+}

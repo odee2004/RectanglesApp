@@ -1,0 +1,175 @@
+﻿@page "/"
+@using Models
+@using Rectangles.Shared.ViewModels
+
+<h1>Rectangles</h1>
+
+<br />
+
+@if (grid != null)
+{
+    <table cellpadding="0" cellspacing="0">
+        <tr>
+            <th></th>
+            @for (var hx = 0; hx < grid.Width; hx++)
+            {
+                <th>@hx</th>
+            }
+        </tr>
+        @for (var y = 0; y < grid.Height; y++)
+        {
+            <tr>
+                <th>@y</th>
+                @for (var x = 0; x < grid.Width; x++)
+                {
+                    var xcoord = x;
+                    var ycoord = y;
+
+                    <td style="background-color: @grid.GetColor(new Point(x, y))">
+                        <input style="opacity: 0;" type="submit" @onclick="@(e => RemoveRectangle(xcoord, ycoord) )" /> @*@x, @y*@
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+
+    <br />
+
+    <p>Note: You can click anywhere inside a Rectangle to delete it.</p>
+
+    <label>Left Point of Rectangle</label>
+    <br />
+    <label>
+        x-coordinate:
+        <input type="number" id="leftx" min="0" @bind="recInput.LeftX" />
+    </label>
+
+    <label>
+        y-coordinate:
+        <input type="number" id="lefty" min="0" @bind="recInput.LeftY" />
+    </label>
+
+    <br />
+    <br />
+
+    <label>Right Point of Rectangle</label>
+    <br />
+    <label>
+        x-coordinate:
+        <input type="number" id="rightx" min="0" @bind="recInput.RightX" />
+    </label>
+
+    <label>
+        y-coordinate:
+        <input type="number" id="righty" min="0" @bind="recInput.RightY" />
+    </label>
+
+    <br />
+
+    <label>
+        Color:
+        <select id="color" name="cars" @bind="recInput.Color">
+            <option style="background-color: red;" value="red">Red</option>
+            <option style="background-color: green;" value="green">Green</option>
+            <option style="background-color: blue;" selected="selected" value="blue">Blue</option>
+            <option style="background-color: yellow;" value="yellow">Yellow</option>
+            <option style="background-color: black;" value="black">Black</option>
+            <option style="background-color: gray;" value="gray">Gray</option>
+        </select>
+    </label>
+
+    <br />
+    <br />
+
+    <button class="btn btn-primary" @onclick="AddRectangle">Add Rectangle</button>
+
+    <br />
+    <br />
+}
+else
+{
+    <label>
+        Width:
+        <input type="number" id="length" min="0" @bind="width" />
+    </label>
+
+    <label>
+        Height:
+        <input type="number" id="width" min="0" @bind="height" />
+    </label>
+    <br />
+    <br />
+    <button class="btn btn-primary" @onclick="CreateGrid">Create Grid</button>
+    <br />
+    <br />
+}
+
+@foreach (var msg in messages)
+{
+    <p>@msg</p>
+}
+
+@code {
+    private Grid grid;
+    private List<string> messages;
+    private RectangleViewModel recInput;
+    private int width;
+    private int height;
+
+    protected override void OnInitialized()
+    {
+        messages = new List<string>();
+        recInput = new RectangleViewModel();
+
+        // for testing only
+        //grid = new Grid(5, 5);
+        //grid.AddRectangle(new Point(3, 0), new Point(4, 3), "red");
+    }
+
+    private void AddRectangle()
+    {
+        messages.Clear();
+
+        var result = grid.AddRectangle(new Point(recInput.LeftX, recInput.LeftY), new Point(recInput.RightX, recInput.RightY), recInput.Color);
+
+        if (result)
+        {
+            messages.Add("Successfully added a Rectangle.");
+        }
+        else
+        {
+            messages = grid.GetErrors();
+        }
+    }
+
+    private void RemoveRectangle(int x, int y)
+    {
+        messages.Clear();
+
+        var result = grid.RemoveRectangle(new Point(x, y));
+
+        if (result)
+        {
+            messages.Add("Successfully removed a Rectangle.");
+        }
+        else
+        {
+            messages = grid.GetErrors();
+        }
+
+    }
+
+    private void CreateGrid()
+    {
+        messages.Clear();
+
+        if (width > 4 && height > 4 && width < 26 && height < 26)
+        {
+            grid = new Grid(width, height);
+        }
+        else
+        {
+            messages.Add("Grid not created. A grid must have a width and height of no less than 5 and no greater than 25.");
+        }
+    }
+}
